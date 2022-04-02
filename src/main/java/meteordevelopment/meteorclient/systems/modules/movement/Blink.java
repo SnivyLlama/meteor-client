@@ -8,6 +8,7 @@ package meteordevelopment.meteorclient.systems.modules.movement;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.BoolSetting;
+import meteordevelopment.meteorclient.settings.IntSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Categories;
@@ -26,6 +27,22 @@ public class Blink extends Module {
         .name("render-original")
         .description("Renders your player model at the original position.")
         .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> toggleAfterTicks = sgGeneral.add(new BoolSetting.Builder()
+        .name("toggle-after-ticks")
+        .description("Waits for some ticks before toggling this module.")
+        .defaultValue(false)
+        .build()
+    );
+
+    private final Setting<Integer> ticksToWait = sgGeneral.add(new IntSetting.Builder()
+        .name("ticks-to-wait")
+        .description("The amount of ticks to wait before toggling.")
+        .defaultValue(100)
+        .sliderRange(20, 500)
+        .visible(toggleAfterTicks::get)
         .build()
     );
 
@@ -65,6 +82,9 @@ public class Blink extends Module {
     @EventHandler
     private void onTick(TickEvent.Post event) {
         timer++;
+        if (toggleAfterTicks.get() && timer >= ticksToWait.get()) {
+            toggle();
+        }
     }
 
     @EventHandler
