@@ -65,6 +65,14 @@ public class FriendsCommand extends Command {
                     return SINGLE_SUCCESS;
                 })
         );
+
+        builder.then(literal("clear").executes(context -> {
+                Friends.get().clear();
+                info("Cleared your friends list!");
+
+                return SINGLE_SUCCESS;
+            })
+        );
     }
 
     private static class FriendArgumentType implements ArgumentType<Friend> {

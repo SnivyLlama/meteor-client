@@ -60,6 +60,10 @@ public class Friends extends System<Friends> implements Iterable<Friend> {
         return false;
     }
 
+    public void clear() {
+        friends.clear();
+    }
+
     public Friend get(String name) {
         for (Friend friend : friends) {
             if (friend.name.equals(name)) {
