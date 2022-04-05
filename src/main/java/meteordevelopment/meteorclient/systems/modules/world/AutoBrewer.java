@@ -5,6 +5,7 @@
 
 package meteordevelopment.meteorclient.systems.modules.world;
 
+import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.PotionSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
@@ -14,6 +15,7 @@ import meteordevelopment.meteorclient.utils.misc.MyPotion;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.item.ThrowablePotionItem;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
@@ -26,6 +28,13 @@ public class AutoBrewer extends Module {
             .name("potion")
             .description("The type of potion to brew.")
             .defaultValue(MyPotion.Strength)
+            .build()
+    );
+
+    private final Setting<Boolean> splash = sgGeneral.add(new BoolSetting.Builder()
+            .name("splash")
+            .description("Brew splash potions instead of normal potions.")
+            .defaultValue(false)
             .build()
     );
 
@@ -74,6 +83,12 @@ public class AutoBrewer extends Module {
             // Check for fuel for the brew and add the ingredient.
             if (checkFuel(c)) return;
             if (insertIngredient(c, potion.get().ingredients[ingredientI])) return;
+            ingredientI++;
+            timer = 0;
+        } else if (ingredientI == potion.get().ingredients.length && splash.get()) {
+            // Check for fuel... again, and add gunpowder
+            if (checkFuel(c)) return;
+            if (insertIngredient(c, Items.GUNPOWDER)) return;
             ingredientI++;
             timer = 0;
         } else {
