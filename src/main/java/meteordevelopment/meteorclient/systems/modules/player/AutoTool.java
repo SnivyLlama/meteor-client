@@ -17,6 +17,7 @@ import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -25,10 +26,17 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ShearsItem;
 import net.minecraft.item.ToolItem;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 public class AutoTool extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
+
+    private final Setting<List<Block>> blacklist = sgGeneral.add(new BlockListSetting.Builder()
+        .name("blacklist")
+        .description("Blocks to not consider.")
+        .build()
+    );
 
     private final Setting<EnchantPreference> prefer = sgGeneral.add(new EnumSetting.Builder<EnchantPreference>()
         .name("prefer")
@@ -111,6 +119,9 @@ public class AutoTool extends Module {
         // Get blockState
         BlockState blockState = mc.world.getBlockState(event.blockPos);
         if (!BlockUtils.canBreak(event.blockPos, blockState)) return;
+
+        // Check if it's blacklisted
+        if (blacklist.get().contains(blockState.getBlock())) return;
 
         // Check if we should switch to a better tool
         ItemStack currentStack = mc.player.getMainHandStack();
